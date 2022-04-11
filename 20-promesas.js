@@ -62,3 +62,24 @@ async function getCharacterAsync(id){
 // Que loguee el nombre del planeta
 // Bonus: Utilizando Promise.all() loguear los nombres de todos los residentes de ese planeta. Documetación Promise all: https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
 
+async function getCharacterEjercicio(id){
+    try{
+        const characterResponse = await fetch(`https://swapi.dev/api/people/${id}`)
+        const character = await characterResponse.json()
+        const planetResponse = await fetch(character.homeworld)
+        const planet = await planetResponse.json()
+       
+        console.log(`El personaje seleccionado es ${character.name} y es del planeta ${planet.name}`)
+        
+        const residentFetchArray = await Promise.all(planet.residents.map(residentUrl => fetch(residentUrl)))
+        const residents =  await Promise.all(residentFetchArray.map(residentResponse => residentResponse.json()))
+
+        console.log(residents.map(resident=> resident.name))
+
+        return character
+
+    }catch(error){
+        console.log("Hubo un error: ", error)
+    }
+}
+
